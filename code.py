@@ -2,6 +2,8 @@ import ImageGrab
 import os
 import time
 import win32api, win32con
+import ImageOps
+from numpy import *
 
 """
  
@@ -40,7 +42,13 @@ def get_cords():
     y = y - y_offset
     print x,y
 
-class Cords:
+def clickOn(cord, finalwait = 1.5)
+    mousePos(cord)
+    time.sleep(.1)
+    leftClick()
+    time.sleep(finalwait)
+
+class Cord:
     f_shrimp = (41,335)
     f_rice = (98,337)
     f_nori = (35, 389)
@@ -152,13 +160,50 @@ def makeFood(food):
         mousePos(Cord.f_roe)
         leftClick()
         time.sleep(.05)
-         mousePos(Cord.f_roe)
+        mousePos(Cord.f_roe)
         leftClick()
         time.sleep(.1)
         foldMat()
         time.sleep(1.5)
 
 
+def buyFood(food):
+
+    if food == 'nori':
+        mousePos(Cord.phone)
+        time.sleep(.1)
+        leftClick()
+        mousePos(Cord.menu_toppings)
+        time.sleep(.05)
+        leftClick()
+        s = screenGrab()
+        if s.getpixel(Cord.t_nori) != (33, 30, 11)
+            print 'nori is available'
+            mousePos(Cord.t_nori)
+            time.sleep(.1)
+            leftClick()
+            mousePos(Cord.delivery_norm)
+            time.sleep(.1)
+            leftClick()
+            time.sleep(2.5)
+        else:
+            print "nori is NOT available'
+            mou
+        
+    
+    mousePos(Cord.phone)
+    mousePos(Cord.menu_toppings)
+    mousePos(Cord.t_shrimp)
+    mousePos(Cord.t_nori)
+    mousePos(Cord.t_roe)
+    mousePos(Cord.t_salmon)
+    mousePos(Cord.t_unagi)
+    mousePos(Cord.t_exit)
+
+    mousePos(Cord.menu_rice)
+    mousePos(Cord.buy_rice)
+
+    mousePos(Cord.delivery_norm)
 
 
 def startGame():
@@ -186,8 +231,8 @@ def startGame():
 def screenGrab():
     box = (x_offset + 1, y_offset + 1,x_offset + 640, y_offset + 480)
     im = ImageGrab.grab(box)
-    im.save(os.getcwd() + '\\full_snap__' + str(int(time.time())) + '.png', 'PNG')
-
+    #im.save(os.getcwd() + '\\full_snap__' + str(int(time.time())) + '.png', 'PNG')
+    return im
 
 
 def main():
