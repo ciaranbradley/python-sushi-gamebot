@@ -10,8 +10,11 @@ x_pad = 156
 y_pad = 345
 Play area =  x_pad+1, y_pad+1, 796, 825
 """
-x_offset = 156
-y_offset = 313
+#x_offset = 156
+#y_offset = 313
+#laptop
+x_offset = 9
+y_offset = 80
 
 
 def screenGrab():

@@ -6,16 +6,22 @@ import ImageOps
 from numpy import *
 
 """
- 
-All coordinates assume a screen resolution of 1280x1024, and Chrome 
+
+All coordinates assume a screen resolution of 1280x1024, and Chrome
 maximized with the Bookmarks Toolbar enabled.
 Down key has been hit 4 times to center play area in browser.
 x_pad = 156
 y_pad = 345
 Play area =  x_pad+1, y_pad+1, 796, 825
 """
-x_offset = 156
-y_offset = 313
+
+#desktop
+#x_offset = 156
+#y_offset = 313
+#laptop
+x_offset = 9
+y_offset = 80
+
 
 def leftClick():
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
@@ -42,7 +48,7 @@ def get_cords():
     y = y - y_offset
     print x,y
 
-def clickOn(cord, finalwait = 1.5)
+def clickOn(cord, finalwait = 2.5):
     mousePos(cord)
     time.sleep(.1)
     leftClick()
@@ -58,17 +64,17 @@ class Cord:
 
     phone = (564, 385)
     mat = (133, 406)
-    menu_toppings = (540, 276)
+    menu_toppings = (540, 271)
+    t_exit = (585, 345)
     
+    t_shrimp = (460, 227)
+    t_nori = (460,291)
+    t_roe = (543,291)
+    t_salmon = (460,345)
+    t_unagi = (543,227)
 
-    t_shrimp = (496, 228)
-    t_nori = (489,273)
-    t_roe = (577,282)
-    t_salmon = (493,334)
-    t_unagi = (577,233)
-
-    menu_rice = (531,294)
-    buy_rice = (546, 299)
+    menu_rice = (540,292)
+    buy_rice = (536, 292)
     menu_sake = (528,314)
     buy_sake = (543,288)
     delivery_norm = (484,299)
@@ -88,17 +94,17 @@ Plate cords
 
 
 def clearTables():
-    mousePos((91, 208))
+    mousePos((87, 210))
     leftClick()
-    mousePos((193, 208))
+    mousePos((191, 210))
     leftClick()
-    mousePos((298, 212))
+    mousePos((290, 210))
     leftClick()
-    mousePos((394, 212))
+    mousePos((392, 210))
     leftClick()
-    mousePos((495, 212))
+    mousePos((494, 210))
     leftClick()
-    mousePos((604, 212))
+    mousePos((595, 210))
     leftClick()
     time.sleep(1)
 
@@ -114,6 +120,14 @@ Recipies
     gunkan:
         1 rice, 1 nori, 2 roe
 """
+foodOnHand = {'shrimp':5,
+              'rice':10,
+              'nori':10,
+              'roe':10,
+              'salmon':5,
+              'unagi':5}
+              
+
 
 def foldMat():
     mousePos(Cord.mat)
@@ -123,6 +137,9 @@ def foldMat():
 def makeFood(food):
     if food == "caliroll":
         print "Making a caliroll"
+        foodOnHand['rice'] -= 1
+        foodOnHand['nori'] -= 1
+        foodOnHand['roe'] -= 1
         mousePos(Cord.f_rice)
         leftClick()
         time.sleep(.05)
@@ -137,6 +154,8 @@ def makeFood(food):
 
     elif food == 'onigiri':
         print "Making onigiri"
+        foodOnHand['rice'] -= 2
+        foodOnHand['nori'] -= 1
         mousePos(Cord.f_rice)
         leftClick()
         time.sleep(.05)
@@ -149,8 +168,11 @@ def makeFood(food):
         foldMat()
         time.sleep(1.5)
 
-    elif food == 'gunkan': 
+    elif food == 'gunkan':
         print "Making gunkan"
+        foodOnHand['rice'] -= 1
+        foodOnHand['nori'] -= 1
+        foodOnHand['roe'] -= 2
         mousePos(Cord.f_rice)
         leftClick()
         time.sleep(.05)
@@ -166,45 +188,132 @@ def makeFood(food):
         foldMat()
         time.sleep(1.5)
 
+def cr():
+    makeFood('caliroll')
+
+def og():
+    makeFood('onigiri')
+
+def gk():
+    makeFood('gunkan')
+
+def openPhone():
+    mousePos(Cord.phone)
+    time.sleep(.1)
+    leftClick()
+
+def buyItem(item_cord, item_name):
+    mousePos(item_cord)
+    time.sleep(.5)
+    leftClick()
+    mousePos(Cord.delivery_norm)
+    foodOnHand[item_name] += 10
+    time.sleep(.5)
+    leftClick()
+    time.sleep(.3)
+
+def buyRice():
+    buyItem(Cord.buy_rice, 'rice')
+
+def closePhone():
+    mousePos(Cord.t_exit)
+    leftClick()
+    time.sleep(1)
 
 def buyFood(food):
+    #Rice has it's own menu
+    if food == 'rice':
+        openPhone()
+        mousePos(Cord.menu_rice)
+        time.sleep(.5)
+        leftClick()
+        s = screenGrab()
+        if s.getpixel(Cord.buy_rice) != (127,127,127):
+            print "rice is available"
+            buyItem(Cord.buy_rice, 'rice')
+        else:
+            print 'rice is NOT available'
+            closePhone()
+            buyFood(food)
 
     if food == 'nori':
-        mousePos(Cord.phone)
-        time.sleep(.1)
+        openPhone()
+        mousePos(Cord.menu_toppings)
+        time.sleep(.5)
         leftClick()
+        s = screenGrab()
+        if s.getpixel(Cord.t_nori) != (109, 123, 127):
+            print 'nori is available'
+            buyItem(Cord.t_nori, 'nori')
+            
+        else:
+            print "nori is NOT available"
+            closePhone()
+            buyFood(food)
+
+    if food == 'roe':
+        openPhone()
         mousePos(Cord.menu_toppings)
         time.sleep(.05)
         leftClick()
         s = screenGrab()
-        if s.getpixel(Cord.t_nori) != (33, 30, 11)
-            print 'nori is available'
-            mousePos(Cord.t_nori)
-            time.sleep(.1)
-            leftClick()
-            mousePos(Cord.delivery_norm)
-            time.sleep(.1)
-            leftClick()
-            time.sleep(2.5)
+        if s.getpixel(Cord.t_roe) != (109, 123, 127):
+            print 'roe is available'
+            buyItem(Cord.t_roe, 'roe')
         else:
-            print "nori is NOT available'
-            mou
+            print "roe is NOT available"
+            closePhone()
+            buyFood(food)
         
-    
-    mousePos(Cord.phone)
-    mousePos(Cord.menu_toppings)
-    mousePos(Cord.t_shrimp)
-    mousePos(Cord.t_nori)
-    mousePos(Cord.t_roe)
-    mousePos(Cord.t_salmon)
-    mousePos(Cord.t_unagi)
-    mousePos(Cord.t_exit)
+    if food == 'shrimp':
+        openPhone()
+        mousePos(Cord.menu_toppings)
+        time.sleep(.05)
+        leftClick()
+        s = screenGrab()
+        if s.getpixel(Cord.t_shrimp) != (109, 123, 127):
+            print 'shrimp is available'
+            buyItem(Cord.t_shrimp, 'shrimp')
+        else:
+            print "shrimp is NOT available"
+            closePhone()
+            buyFood(food)
 
-    mousePos(Cord.menu_rice)
-    mousePos(Cord.buy_rice)
+    if food == 'salmon':
+        openPhone()
+        mousePos(Cord.menu_toppings)
+        time.sleep(.05)
+        leftClick()
+        s = screenGrab()
+        if s.getpixel(Cord.t_salmon) != (109, 123, 127):
+            print 'salmon is available'
+            buyItem(Cord.t_salmon,'salmon')
+        else:
+            print "salmon is NOT available"
+            closePhone()
+            buyFood(food)
 
-    mousePos(Cord.delivery_norm)
+    if food == 'unagi':
+        openPhone()
+        mousePos(Cord.menu_toppings)
+        time.sleep(.05)
+        leftClick()
+        s = screenGrab()
+        if s.getpixel(Cord.t_unagi) != (109, 123, 127):
+            print 'unagi is available'
+            buyItem(Cord.t_unagi,'unagi')
+        else:
+            print "unagi is NOT available"
+            closePhone()
+            buyFood(food)
 
+
+def checkFood():
+    for i, j in foodOnHand.items():
+        if i == 'nori' or i == 'rice' or i == 'roe':
+            if j <= 4:
+                print '%s is low and needs to be replenished' % i
+                buyFood(i)
 
 def startGame():
     #Start Button Click
@@ -227,16 +336,113 @@ def startGame():
     leftClick()
     time.sleep(.1)
 
-    
+
 def screenGrab():
     box = (x_offset + 1, y_offset + 1,x_offset + 640, y_offset + 480)
     im = ImageGrab.grab(box)
     #im.save(os.getcwd() + '\\full_snap__' + str(int(time.time())) + '.png', 'PNG')
     return im
 
+seat_offset = 26
+
+seats = {'seat_1': (seat_offset, 62),
+         'seat_2': (seat_offset + 101, 62),
+         'seat_3': (seat_offset + 202, 62),
+         'seat_4': (seat_offset + 303, 62),
+         'seat_5': (seat_offset + 404, 62),
+         'seat_6': (seat_offset + 505, 62)}
+
+"""
+cr = 2100
+gk = 5634
+og = 1843
+"""
+
+sushiTypes = {1843:'onigiri',
+              2100:'caliroll',
+              1770:'gunkan'}
+
+class Blank:
+    seat_1 = 7204
+    seat_2 = 5858
+    seat_3 = 10639
+    seat_4 = 9838
+    seat_5 = 5198
+    seat_6 = 6635
+
+def grab_seats():
+    for i in seats:
+        print "Grabbing " + i
+        box = (x_offset + seats[i][0], 
+               y_offset + seats[i][1],
+               x_offset + seats[i][0] + 55,
+               y_offset + seats[i][1] + 16)
+        im = ImageOps.grayscale(ImageGrab.grab(box))
+        a = array(im.getcolors())
+        a = a.sum()
+        print a
+        im.save(os.getcwd() + '\\'+ i + '__' + str(int(time.time())) + '.png', 'PNG')
+        #return a
+        
+
+def grab_seat(name, pos_tuple):
+    box = (x_offset + pos_tuple[0], 
+           y_offset + pos_tuple[1],
+           x_offset + pos_tuple[0] + 55,
+           y_offset + pos_tuple[1] + 16)
+    im = ImageOps.grayscale(ImageGrab.grab(box))
+    a = array(im.getcolors())
+    a = a.sum()
+    print a
+    #im.save(os.getcwd() + '\\'+ name + '__' + str(int(time.time())) + '.png', 'PNG')
+    return a
+    
+
+def grab():
+    box = (x_offset + 1, y_offset + 1,x_offset + 640, y_offset + 480)
+    im = ImageOps.grayscale(ImageGrab.grab(box))
+    a = array(im.getcolors())
+    a = a.sum()
+    print a
+    return a
+
+
+def checkSeat(seat_name):
+    
+    s = grab_seat(seat_name, seats[seat_name])
+    if s != getattr(Blank, seat_name):
+        if sushiTypes.has_key(s):
+            print '%s is occupied and needs %s' % (seat_name, sushiTypes[s])
+            makeFood(sushiTypes[s])
+        else:
+            print '%s sushi not found!\n sushiType %i' % (seat_name, s)
+
+    else:
+        print '%s unoccupied: debug %i' % (seat_name, s)
+    
+
+def checkBubs():
+    
+    checkSeat('seat_1')
+    checkSeat('seat_2')
+    checkFood()
+    checkSeat('seat_3')
+    clearTables()
+    checkSeat('seat_4')
+    checkFood()
+    checkSeat('seat_5')
+    checkSeat('seat_6')
+    checkFood()
+    clearTables()
+    time.sleep(3)
+    
+    
+    
 
 def main():
-    screenGrab()
+    startGame()
+    while True:
+        checkBubs()
 
 if __name__ == '__main__':
     pass
